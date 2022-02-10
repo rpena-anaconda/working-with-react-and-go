@@ -65,6 +65,22 @@ func (app *application) deleteMoview(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (app *application) editMovie(w http.ResponseWriter, r *http.Request) {
+	type jsonReponse struct {
+		OK bool `json:"ok"`
+	}
+
+	ok := jsonReponse{
+		OK: true,
+	}
+
+	err := app.writeJSON(w, http.StatusOK, ok, "response")
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+}
+
 func (app *application) insertMovie(w http.ResponseWriter, r *http.Request) {
 
 }

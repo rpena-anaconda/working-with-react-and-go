@@ -19,6 +19,7 @@ function EditMovie() {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState();
+    const [errors, setErrors] = useState([]);
 
     const mpaaRating = [
         { id: "G", value: "G" },
@@ -48,7 +49,7 @@ function EditMovie() {
                             ...json.movie,
                             release_date: releaseDate.toISOString().split("T")[0]
                         }
-                        debugger;
+
                         setMovie(updatedMovie);
                     }
                     setLoading(false);
@@ -71,13 +72,49 @@ function EditMovie() {
             ...movie,
             [name]: value
         });
-        debugger;
     };
+
+    const hasError = (key) => {
+        debugger;
+        return errors.indexOf(key) !== -1;
+    };
+
+    const checkForErrors = () => {
+        let errors = [];
+
+        if (movie.title === "") {
+            errors.push("title");
+        } else if (movie.description === "") {
+            errors.push("description");
+        }
+
+        return errors;
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        console.log('values of new movie', movie)
+        // client side validation
+        let errors = checkForErrors();
+        setErrors(errors);
+
+        if (errors.length > 0) {
+            return false;
+        }
+
+
+        const data = new FormData(e.target);
+        const payload = Object.fromEntries(data.entries());
+        const requestOptions = {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        };
+
+        fetch(`http://localhost:4000/v1/admin/editmovie`, requestOptions)
+            .then(response => response.json())
+            .then(json => {
+                console.log('data:', data)
+            });
     }
 
     if (error) {
@@ -95,10 +132,13 @@ function EditMovie() {
 
                     <Input
                         title={"Title"}
+                        className={hasError("title") ? "is-invalid" : ""}
                         type={"text"}
                         name={"title"}
                         value={movie.title}
                         handleChange={handleChange("title")}
+                        errorDiv={hasError("title") ? "text-danger" : "d-none"}
+                        errorMsg={"Please enter a title"}
                     />
 
                     {/* <div className="mb-3">
@@ -170,9 +210,12 @@ function EditMovie() {
                     <Textarea
                         title={"Description"}
                         name={"description"}
+                        className={hasError("description") ? "is-invalid" : ""}
                         value={movie.description}
                         rows={"3"}
                         handleChange={handleChange("description")}
+                        errorDiv={hasError("description") ? "text-danger" : "d-none"}
+                        errorMsg={"Please enter a description"}
                     />
 
                     {/* <div className="mb-3">

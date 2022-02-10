@@ -1,7 +1,6 @@
 import React from 'react';
 
 function Select(props) {
-    console.log(props.options)
     return (
         <div className="mb-3">
             <label htmlFor={props.name} className='form-label'>
