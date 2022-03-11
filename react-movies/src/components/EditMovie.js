@@ -4,7 +4,7 @@ import Input from './form-components/Input'
 import Textarea from './form-components/Textarea'
 import Select from './form-components/Select'
 import { useParams } from 'react-router-dom';
-
+import Alert from './ui-components/Alert'
 
 function EditMovie() {
     const { id } = useParams();
@@ -20,6 +20,7 @@ function EditMovie() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState();
     const [errors, setErrors] = useState([]);
+    const [alert, setAlert] = useState({ type: "d-none", message: "" })
 
     const mpaaRating = [
         { id: "G", value: "G" },
@@ -112,8 +113,12 @@ function EditMovie() {
 
         fetch(`http://localhost:4000/v1/admin/editmovie`, requestOptions)
             .then(response => response.json())
-            .then(json => {
-                console.log('data:', data)
+            .then(data => {
+                if (data.error) {
+                    setAlert({ type: "alert-danger", message: data.error })
+                } else {
+                    setAlert({ type: "alert-success", message: "Changes saved!" })
+                }
             });
     }
 
@@ -125,6 +130,7 @@ function EditMovie() {
         return (
             <>
                 <h2>Add/Edit Movie</h2>
+                <Alert alertType={alert.type} alertMessage={alert.message} />
                 <hr />
 
                 <form method="post" onSubmit={handleSubmit}>
